@@ -1,0 +1,20 @@
+﻿- Add image files path to session
+- page to display loaded images using session
+- allow user to ebter text for each image
+- format report (SQL report) and generate PDF
+
+
+2013-01-14
+- Image limit to 1M, in web.config
+- dbl-click pic bring textbox
+
+
+2013-01-20 Fred
+1. Clear the dropdownbox when the textbox display
+2. use report title name instead of session_id for pdf report. remove invalid character from title
+   > ResizeImage(string OriginalFile, string NewFile, int NewWidth, int MaxHeight, bool OnlyResizeIfWider)
+     find similar method using HTPPPostFile for OriginalFile
+3. use session_start to delete work files older than today
+         \uploads
+         \PDF
+4. need activate authorization (authorization code specified in web.config)

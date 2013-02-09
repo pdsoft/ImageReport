@@ -1,0 +1,8 @@
+﻿;
+picklist1:picklist text1;
+picklist2:picklist text2;
+picklist3:picklist text3;
+picklist4:picklist text4;
+picklist5:picklist text5;
+picklist6:picklist text6;
+picklist7:picklist text7;

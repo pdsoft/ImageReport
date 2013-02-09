@@ -20,6 +20,8 @@
 4. need activate authorization (authorization code specified in web.config)
 
 
+Fred Changes
+Geoffrey Edit Something
 Geoffrey Edit Something
 
 Fred Changes

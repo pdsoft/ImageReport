@@ -81,7 +81,6 @@ namespace ImageReport
                     {
                         tr.Cells.Add(AddEmptyCell());
                     }
-
                 }
 
                 imgTable.Rows.Add(tr);
@@ -139,20 +138,25 @@ namespace ImageReport
 
             //-------------------------------------
             TableCell tc = new TableCell();
+            tc.CssClass = "dragdrop";           // by Fred, 2-13-2013
 
             string tempPath = GetConfigValue.UploadPath;    // by Fred, 1-20-2013
 
             Image img = new Image();
 
+            img.CssClass = "dragdrop";          // by Fred, 2-13-2013
             img.ImageUrl = @"\" + tempPath + @"\" + FileName;
             img.Style["width"] = Convert.ToString(1100 / columns) + "px";
             img.Attributes["ondblclick"] = "ShowEditTextbox(" + ImageNo + ",\"" + FileName + "\")";
             img.ID = "img" + ImageNo;
+            img.Attributes["FileName"] = FileName;          // by Fred, 2-13-2013
+            img.Attributes["ImageNo"] = ImageNo;          // by Fred, 2-14-2013
 
             tc.Controls.Add(img);
             tc.VerticalAlign = VerticalAlign.Middle;
 
             tr.Cells.Add(tc);
+
             //--------------------------------
             TableCell tc2 = new TableCell();
             tc2.Controls.Add(Icons(FileName, ImageNo));
@@ -160,12 +164,9 @@ namespace ImageReport
             tc2.HorizontalAlign = HorizontalAlign.Left;
 
             tr.Cells.Add(tc2);
-
-
             tbl.Rows.Add(tr);
 
             return tbl;
-
         }
 
         //---------------------------------------------------
@@ -173,9 +174,8 @@ namespace ImageReport
         {
             HtmlGenericControl icons = new HtmlGenericControl();
 
-            string img1 = "<img alt='' src='images/edit.gif' Style='cursor:hand' onclick='ShowEditTextbox(" + ImageNo + ",\"" + FileName + "\")'  />";
-            string img2 = "<img alt='' src='images/del.gif' Style='cursor:hand' onclick='RemoveImage(" + ImageNo + ",\"" +  FileName + "\")'  />";
-            //string img2 = "<img alt='' src='images/del.gif' Style='cursor:hand' onclick=RemoveImage(" + ImageNo + ")  />";
+            string img1 = "<img alt='' class='edit' src='images/edit.gif' Style='cursor:pointer' onclick='ShowEditTextbox(" + ImageNo + ",\"" + FileName + "\")'  />";      // by Fred, add class, 2-14-2013
+            string img2 = "<img alt='' class='delete' src='images/del.gif' Style='cursor:pointer' onclick='RemoveImage(" + ImageNo + ",\"" + FileName + "\")'  />";         // by Fred, add class, 2-14-2013
 
             icons.InnerHtml = "&nbsp;" + ImageNo.ToString() + "<br />" + img1 + "<br />" + img2;
 
@@ -316,5 +316,34 @@ namespace ImageReport
             ef.InsertPickListItem(tblName, NewListItem);
         }
 
+        // by Fred, 2-13-2013
+        [WebMethod(EnableSession = true)]
+        public static void SwitchImage(string img1, string img2)
+        {
+            IDictionary<string, string> temp = new Dictionary<string, string>();
+            IDictionary<string, string> LoadedImgFiles
+                        = (IDictionary<string, string>)HttpContext.Current.Session["LoadedIamges"];
+
+            // re-create the Dictionary
+            for (int i = 0; i < LoadedImgFiles.Count; i++)
+            {
+                var pair = LoadedImgFiles.ElementAt(i);
+
+                if (pair.Key == img1)
+                {
+                    temp.Add(img2, LoadedImgFiles[img2]);
+                }
+                else if (pair.Key == img2)
+                {
+                    temp.Add(img1, LoadedImgFiles[img1]);
+                }
+                else
+                {
+                    temp.Add(pair.Key, pair.Value);
+                } 
+            }
+
+            HttpContext.Current.Session["LoadedIamges"] = temp;
+        }
     }
 }

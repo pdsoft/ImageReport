@@ -320,9 +320,9 @@ namespace ImageReport
         [WebMethod(EnableSession = true)]
         public static void SwitchImage(string img1, string img2)
         {
-            IDictionary<string, string> temp = new Dictionary<string, string>();
-            IDictionary<string, string> LoadedImgFiles
-                        = (IDictionary<string, string>)HttpContext.Current.Session["LoadedIamges"];
+            IDictionary<string, MyImage> temp = new Dictionary<string, MyImage>();
+            IDictionary<string, MyImage> LoadedImgFiles
+                        = (IDictionary<string, MyImage>)HttpContext.Current.Session["LoadedIamges"];
 
             // re-create the Dictionary
             for (int i = 0; i < LoadedImgFiles.Count; i++)

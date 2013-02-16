@@ -18,16 +18,17 @@
 
      //------------------------------------
      //----------------------------------------
-     function calculateSumOffset(idItem, offsetName) {
-         var totalOffset = 0;
-         var item = eval('idItem');
+//     function calculateSumOffset(idItem, offsetName) {
+//         var totalOffset = 0;
+//         var item = eval('idItem');
 
-         do {
-             totalOffset += eval('item.' + offsetName);
-             item = eval('item.offsetParent');
-         } while (item != null);
-         return totalOffset;
-     }
+//         do {
+//             totalOffset += eval('item.' + offsetName);
+//             item = eval('item.offsetParent');
+//         } while (item != null);
+
+//         return totalOffset;
+//     }
      
      //-----------------------------------------
      function ShowEditTextbox(ImageNo, fileName) {
@@ -44,11 +45,12 @@
              success: function (d) { txt1 = d; }
          });
 
-         var img = document.getElementById("img" + ImageNo);
-         //         leftX = calculateSumOffset(event.srcElement, 'offsetLeft') - 350;
-         //         leftY = calculateSumOffset(event.srcElement, 'offsetTop') + 5;
-         leftX = calculateSumOffset(img, 'offsetLeft') + 10;
-         leftY = calculateSumOffset(img, 'offsetTop') + 10;
+         //var img = document.getElementById("img" + ImageNo);
+         //leftX = calculateSumOffset(img, 'offsetLeft') + 10;
+         //leftY = calculateSumOffset(img, 'offsetTop') + 10;
+         var offset = $("#img" + ImageNo).offset();
+         leftX = offset.left + 10;
+         leftY = offset.top + 10;
 
          divNote.style.pixelLeft = leftX;
          divNote.style.pixelTop = leftY;
@@ -243,8 +245,8 @@
                   onselectedindexchanged="DropDownList1_SelectedIndexChanged" AutoPostBack="true">
               <asp:ListItem>1</asp:ListItem>
               <asp:ListItem Selected>2</asp:ListItem>
-               <%--<asp:ListItem>3</asp:ListItem>
-               <asp:ListItem>4</asp:ListItem>--%>
+               <asp:ListItem>3</asp:ListItem>
+               <asp:ListItem>4</asp:ListItem>
           </asp:DropDownList> &nbsp; 
           <span class="textbox" style="top:-4px">Column(s) per row</span>
           </div>

@@ -17,9 +17,10 @@
         Observation:
     </td>
     <td>
-        <asp:DropDownList ID="ddObservation" runat="server" Width="330px" CssClass="textbox">
+        <asp:TextBox ID="txtObservation" runat="server" Width="330px" CssClass="textbox"></asp:TextBox>
+<%--        <asp:DropDownList ID="ddObservation" runat="server" Width="330px" CssClass="textbox">
             <asp:ListItem></asp:ListItem>
-        </asp:DropDownList>&nbsp;
+        </asp:DropDownList>&nbsp;--%>
         <asp:LinkButton ID="LinkButton1" CssClass="link" runat="server" OnClientClick="AddItem2PickList();return false;">Add to list</asp:LinkButton>
     </td>
 </tr>
@@ -28,9 +29,10 @@
         Deficiency:
     </td>
     <td>
-        <asp:DropDownList ID="ddDeficiency" runat="server" Width="330px" CssClass="textbox">
+        <asp:TextBox ID="txtDeficiency" runat="server" Width="330px" CssClass="textbox"></asp:TextBox>
+<%--        <asp:DropDownList ID="ddDeficiency" runat="server" Width="330px" CssClass="textbox">
             <asp:ListItem></asp:ListItem>
-        </asp:DropDownList>&nbsp;
+        </asp:DropDownList>&nbsp;--%>
         <asp:LinkButton ID="LinkButton2" CssClass="link" runat="server" OnClientClick="AddItem2PickList();return false;">Add to list</asp:LinkButton>
     </td>
 </tr>

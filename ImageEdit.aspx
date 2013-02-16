@@ -59,11 +59,16 @@
          document.all("_FileName").value = fileName;
 
          var obj = jQuery.parseJSON(txt1);
-         //document.getElementById("edtForm_txtRecommendation").value = obj.d;
 
-         document.getElementById("edtForm_ddObservation").value = $(obj.d).find("Observation").text();
-         document.getElementById("edtForm_ddDeficiency").value = $(obj.d).find("Deficiency").text();
+         // by Fred, 2-16-2013
+         document.getElementById("edtForm_txtObservation").value = $(obj.d).find("Observation").text();
+         document.getElementById("edtForm_txtDeficiency").value = $(obj.d).find("Deficiency").text();
          document.getElementById("edtForm_txtRecommendation").value = $(obj.d).find("Recommendation").text();
+    
+         // get autocomplele on textbox
+         AutoComplete("edtForm_txtObservation", 0);
+         AutoComplete("edtForm_txtDeficiency", 1);
+         AutoComplete("edtForm_txtRecommendation", 2);
 
          //-----------------------------------
          //$("divNote").mousedown(function (e) { alert("ff"); dragBegin(e); });
@@ -72,8 +77,34 @@
         // $("#ddImageTextList").val("");
      }
 
+     // by Fred, 2-16-2013
+     function AutoComplete(txtControl, tableIndex) {
+         $("#" + txtControl).autocomplete({
+             source: function (request, response) {
+                 $.ajax({
+                     type: "post",
+                     url: "ImageEdit.aspx/GetListFromExcel",
+                     data: '{"term":"' + request.term + '", "tableIndex":' + tableIndex + '}',
+                     contentType: "application/json",
+                     dataType: "json",
+                     success: function (data) {
+                         response($.map(data.d, function (item) {
+                             return {
+                                 value: item
+                             }
+                         }))
+                     },
+                     error: function (XMLHttpRequest, textStatus, errorThrown) {
+                         alert(textStatus);
+                     },
+                     delay: 500
+                 });
+             }
+         });
 
-
+         $('.ui-corner-all').css('fontSize', '10px');  
+     }
+     // end
      //-----------------------------------------
      function RemoveImage(ImageNo, fileName) {
          var a = confirm("Confirm to remove image #" + ImageNo);
@@ -94,8 +125,8 @@
      function SubmitTextbox() {
          var txt1 = null;
 
-         var desc = "<Summary>" + "<Observation>" + document.getElementById("edtForm_ddObservation").value + "</Observation>"
-                     + "<Deficiency>" + document.getElementById("edtForm_ddDeficiency").value + "</Deficiency>"
+         var desc = "<Summary>" + "<Observation>" + document.getElementById("edtForm_txtObservation").value + "</Observation>"
+                     + "<Deficiency>" + document.getElementById("edtForm_txtDeficiency").value + "</Deficiency>"
                      + "<Recommendation>" + document.getElementById("edtForm_txtRecommendation").value + "</Recommendation>"
                      + "</Summary>";
                      

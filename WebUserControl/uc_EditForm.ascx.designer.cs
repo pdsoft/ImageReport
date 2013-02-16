@@ -13,13 +13,13 @@ namespace ImageReport {
     public partial class uc_EditForm {
         
         /// <summary>
-        /// ddObservation control.
+        /// txtObservation control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddObservation;
+        protected global::System.Web.UI.WebControls.TextBox txtObservation;
         
         /// <summary>
         /// LinkButton1 control.
@@ -31,13 +31,13 @@ namespace ImageReport {
         protected global::System.Web.UI.WebControls.LinkButton LinkButton1;
         
         /// <summary>
-        /// ddDeficiency control.
+        /// txtDeficiency control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddDeficiency;
+        protected global::System.Web.UI.WebControls.TextBox txtDeficiency;
         
         /// <summary>
         /// LinkButton2 control.

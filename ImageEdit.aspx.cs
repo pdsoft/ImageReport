@@ -195,7 +195,6 @@ namespace ImageReport
             //--------------------------------------------------
             DropDownListDataBind("ddObservation", ds.Tables[0]);
             DropDownListDataBind("ddDeficiency", ds.Tables[1]);
-
         }
 
         //----------------------------------------------------
@@ -226,15 +225,15 @@ namespace ImageReport
         //-----------------------------------
         private void DropDownListDataBind(string ddName, DataTable tbl)
         {
-            DropDownList lst = (DropDownList)edtForm.FindControl(ddName);
+            //DropDownList lst = (DropDownList)edtForm.FindControl(ddName);
 
-            string colName = tbl.Columns[0].ColumnName;
+            //string colName = tbl.Columns[0].ColumnName;
 
-            lst.DataSource = tbl;
-            lst.DataTextField = colName; // displayed text in UI
-            lst.DataValueField = colName;
+            //lst.DataSource = tbl;
+            //lst.DataTextField = colName; // displayed text in UI
+            //lst.DataValueField = colName;
 
-            lst.DataBind();
+            //lst.DataBind();
 
         }
 
@@ -344,6 +343,28 @@ namespace ImageReport
             }
 
             HttpContext.Current.Session["LoadedIamges"] = temp;
+        }
+
+        // by Fred, 2-16-2013
+        [WebMethod]
+        static public List<string> GetListFromExcel(string term, int tableIndex)
+        {
+            string FilePath = HttpContext.Current.Server.MapPath("content\\PickList.xlsx");
+
+            ExcelFile ef = new ExcelFile(FilePath);
+            DataSet ds = ef.GetDropDownList();
+
+            List<string> list = new List<string>();
+
+            foreach (DataRow row in ds.Tables[tableIndex].Rows)      // 0 => Observation table
+            {
+                if (row[0].ToString().Contains(term))
+                {
+                    list.Add(row[0].ToString());
+                }
+            }
+
+            return list;
         }
     }
 }

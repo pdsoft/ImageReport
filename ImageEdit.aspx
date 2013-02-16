@@ -5,11 +5,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
     <title></title>
-    <script src="scripts/jquery-1.4.1.js" type="text/javascript"></script>
+    <%--<script src="scripts/jquery-1.4.1.js" type="text/javascript"></script>--%>
     <%--<script src="scripts/DivMouseMov.js" type="text/javascript"></script>--%>
 
     <link href="/CSS/site.css" rel="stylesheet" type="text/css" />
-
+    <link href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" rel="stylesheet" type="text/css" /> 
+    <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.9.0.min.js" type="text/javascript"></script>
+    <script src="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.9.2/jquery-ui.min.js" type="text/javascript"></script>
  <script type="text/javascript">
 
      //------------------------------------
@@ -17,6 +19,7 @@
      function calculateSumOffset(idItem, offsetName) {
          var totalOffset = 0;
          var item = eval('idItem');
+
          do {
              totalOffset += eval('item.' + offsetName);
              item = eval('item.offsetParent');
@@ -110,11 +113,111 @@
      function PopulateDropdowText() {
          var dd = document.all("ddImageTextList");
          document.all("TextBox1").value = dd.options[dd.selectedIndex].value + "\r\n" +
-                                          document.all("TextBox1").value;
-                     
+                                          document.all("TextBox1").value;             
      }
 
- 
+     // by Fred, 2-13-2013
+     $(function () {
+         SetImageDraggable();
+
+         $("td.dragdrop").droppable({
+             over: function (evt, ui) {
+                 $("img.dragdrop:hidden").remove();
+
+                 if (!$(this).is(ui.draggable.parent())) {
+                     $(this).css("opacity", "0.3");
+                 }
+             },
+             out: function (evt, ui) {
+                 $(this).css("opacity", "1");
+             },
+             drop: function (evt, ui) {
+                 var img1 = ui.draggable;
+                 var img2 = $(this).find("img.dragdrop");
+                 var img1No = img1.attr("ImageNo");
+                 var img2No = img2.attr("ImageNo");
+                 var img1FileName = img1.attr("FileName");
+                 var img2FileName = img2.attr("FileName");
+                 var sourceTd = img1.parent();
+                 var targetTd = $(this);
+                 var tempImg;
+
+                 // clone img2, assign id, ImageNo and ondblclick
+                 tempImg = img2.clone();
+                 tempImg.attr("id", "img" + img1No);
+                 tempImg.attr("ImageNo", img1No);
+                 tempImg.removeAttr('ondblclick').dblclick(function () {
+                     ShowEditTextbox(img1No, img2FileName);
+                 });
+
+                 // move target picture to the source td
+                 tempImg.appendTo(sourceTd).css({ position: "", top: "", left: "", opacity: "", zIndex: "" });
+
+                 img2.attr("id", "");
+                 img2.hide();
+
+                 // clone img1, assign id, ImageNo and ondblclick
+                 tempImg = img1.clone();
+                 tempImg.attr("id", "img" + img2No);
+                 tempImg.attr("ImageNo", img2No);
+                 tempImg.removeAttr('ondblclick').dblclick(function () {
+                     ShowEditTextbox(img2No, img1FileName);
+                 });
+
+                 // move the source picture to the target td
+                 tempImg.appendTo(targetTd).css({ position: "", top: "", left: "", opacity: "", zIndex: "" });
+
+                 img1.attr("id", "");
+                 img1.hide();
+
+                 // switch the relative edit, delete icon onclick function
+                 var imgEdit1 = img1.parent().next().find("img.edit");
+                 var imgDelete1 = img1.parent().next().find("img.delete");
+                 var imgEdit2 = img2.parent().next().find("img.edit");
+                 var imgDelete2 = img2.parent().next().find("img.delete");
+
+                 imgEdit1.removeAttr('onclick').unbind('click').click(function () {
+                     ShowEditTextbox(img1No, img2FileName);
+                 });
+
+                 imgDelete1.removeAttr('onclick').unbind('click').click(function () {
+                     RemoveImage(img1No, img2FileName);
+                 });
+
+                 imgEdit2.removeAttr('onclick').unbind('click').click(function () {
+                     ShowEditTextbox(img2No, img1FileName);
+                 });
+
+                 imgDelete2.removeAttr('onclick').unbind('click').click(function () {
+                     RemoveImage(img2No, img1FileName);
+                 });
+
+                 // switch image info in the list
+                 $.ajax({
+                     type: "POST",
+                     contentType: "application/json",
+                     url: "ImageEdit.aspx/SwitchImage",
+                     data: '{"img1":"' + img1.attr("FileName") + '", "img2":"' + img2.attr("FileName") + '"}',
+                     dataType: "text",
+                     success: function (d) { txt1 = d; }
+                 });
+
+                 $(this).css("opacity", "1");
+
+                 SetImageDraggable();
+             }
+         });
+     })
+
+     function SetImageDraggable() {
+         $("img.dragdrop").css("cursor", "pointer");
+         $("img.dragdrop").draggable({
+             revert: true,
+             opacity: 0.70,
+             zIndex: 100
+         });
+     }
+     // end
  </script>
     </head>
 <body style="width:99%; overflow:hidden"  >

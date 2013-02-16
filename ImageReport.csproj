@@ -37,6 +37,26 @@
     <Reference Include="Microsoft.ReportViewer.WebForms, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
     </Reference>
+    <Reference Include="MigraDoc.DocumentObjectModel, Version=1.32.3885.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\MigraDoc.DocumentObjectModel.dll</HintPath>
+    </Reference>
+    <Reference Include="MigraDoc.Rendering, Version=1.32.3885.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\MigraDoc.Rendering.dll</HintPath>
+    </Reference>
+    <Reference Include="MigraDoc.RtfRendering, Version=1.32.3885.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\MigraDoc.RtfRendering.dll</HintPath>
+    </Reference>
+    <Reference Include="PdfSharp, Version=1.32.2608.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\PdfSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="PdfSharp.Charting, Version=1.32.2608.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\PdfSharp.Charting.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Core" />
@@ -70,6 +90,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helper\DiskFileHelper.cs" />
+    <Compile Include="Helper\Excel.cs" />
     <Compile Include="Helper\GetConfigValue.cs" />
     <Compile Include="Helper\ImageHelper.cs" />
     <Compile Include="ImageEdit.aspx.cs">
@@ -80,6 +101,8 @@
       <DependentUpon>ImageEdit.aspx</DependentUpon>
     </Compile>
     <Compile Include="ImageHelper.cs" />
+    <Compile Include="PDFWriter\ImageReportPDF.cs" />
+    <Compile Include="PDFWriter\PDFHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReportOption.aspx.cs">
       <DependentUpon>ReportOption.aspx</DependentUpon>
@@ -92,10 +115,17 @@
       <DependentUpon>TriggerUpload.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="WebUserControl\uc_EditForm.ascx.cs">
+      <DependentUpon>uc_EditForm.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebUserControl\uc_EditForm.ascx.designer.cs">
+      <DependentUpon>uc_EditForm.ascx</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="PDF\" />
+    <Folder Include="PDFWriter\PDF\" />
     <Folder Include="Styles\" />
     <Folder Include="uploads\" />
   </ItemGroup>
@@ -117,8 +147,10 @@
     <Content Include="scripts\uploader.swf" />
     <Content Include="TODO.txt" />
     <Content Include="TriggerUpload.aspx" />
+    <Content Include="WebUserControl\uc_EditForm.ascx" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="content\PickList.xlsx" />
     <None Include="DataSet1.xsc">
       <DependentUpon>DataSet1.xsd</DependentUpon>
     </None>

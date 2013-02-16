@@ -2,10 +2,12 @@
 
 using System;
 using System.Web;
+using System.Web.UI;
 using System.IO;
 using System.Web.SessionState;
 using System.Collections.Generic;
 using ImageReport.Helper;
+using ImageReport.PDFWriter;
 
 public class Upload : IHttpHandler, IRequiresSessionState
 {
@@ -31,21 +33,28 @@ public class Upload : IHttpHandler, IRequiresSessionState
             string filename = SessionId + '-' + postedFile.FileName;
 
             //--------------- save the file to session for report usage
-            IDictionary<string, string> LoadedImgFiles =
-                        (IDictionary<string, string>)HttpContext.Current.Session["LoadedIamges"];
+            IDictionary<string, MyImage> LoadedImgFiles =
+                        (IDictionary<string, MyImage>)HttpContext.Current.Session["LoadedIamges"];
 
             if (LoadedImgFiles.ContainsKey(filename) == false)
             {
-                LoadedImgFiles.Add(filename, "");
-                HttpContext.Current.Session["LoadedIamges"] = LoadedImgFiles;
-
+               
                 //--------------------------
                 if (!Directory.Exists(savepath))
                     Directory.CreateDirectory(savepath);
 
                 //postedFile.SaveAs(savepath + @"\" + filename);
+                MyImage img = new MyImage();
 
-                ImageHelper.ResizeImage(postedFile, savepath + @"\" + filename);      // by Fred, 1-19-2013
+                img.ImageFile = HttpContext.Current.Server.MapPath("uploads") + "\\" + filename;
+                img.ImageDesc = "";
+                img.ImageName = postedFile.FileName;
+                
+                img.ImageOrientation = ImageHelper.ResizeImage(postedFile, savepath + @"\" + filename);      // by Fred, 1-19-2013
+
+                //-------------------------------------------------
+                LoadedImgFiles.Add(filename, img);
+                HttpContext.Current.Session["LoadedIamges"] = LoadedImgFiles;
                 
                 // context.Response.Write(tempPath + "/" + filename);
                 context.Response.StatusCode = 200;

@@ -2,6 +2,8 @@
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+<%@ Register TagPrefix="ImgEdit" TagName="EditForm" Src="/WebUserControl/uc_EditForm.ascx" %>
+
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
     <title></title>
@@ -52,14 +54,20 @@
          document.all("_FileName").value = fileName;
 
          var obj = jQuery.parseJSON(txt1);
-         document.all("TextBox1").value = obj.d;
+         //document.getElementById("edtForm_txtRecommendation").value = obj.d;
+
+         document.getElementById("edtForm_ddObservation").value = $(obj.d).find("Observation").text();
+         document.getElementById("edtForm_ddDeficiency").value = $(obj.d).find("Deficiency").text();
+         document.getElementById("edtForm_txtRecommendation").value = $(obj.d).find("Recommendation").text();
 
          //-----------------------------------
          //$("divNote").mousedown(function (e) { alert("ff"); dragBegin(e); });
 
          // by Fred, 1-19-2013
-         $("#ddImageTextList").val("");
+        // $("#ddImageTextList").val("");
      }
+
+
 
      //-----------------------------------------
      function RemoveImage(ImageNo, fileName) {
@@ -81,7 +89,12 @@
      function SubmitTextbox() {
          var txt1 = null;
 
-         var desc = document.all("TextBox1").value;
+         var desc = "<Summary>" + "<Observation>" + document.getElementById("edtForm_ddObservation").value + "</Observation>"
+                     + "<Deficiency>" + document.getElementById("edtForm_ddDeficiency").value + "</Deficiency>"
+                     + "<Recommendation>" + document.getElementById("edtForm_txtRecommendation").value + "</Recommendation>"
+                     + "</Summary>";
+                     
+         //alert(desc);
 
          $.ajax({
              type: "POST",
@@ -100,6 +113,8 @@
               }
          });
 
+        //form1.submit();
+
          //document.all("TextBox1").value = txt1.toString();
 
         // alert(document.all("TextBox1").value);
@@ -107,25 +122,32 @@
          HideTextbox();
      }
 
+     //---------------------------------------------
      function PopulateDropdowText() {
          var dd = document.all("ddImageTextList");
          document.all("TextBox1").value = dd.options[dd.selectedIndex].value + "\r\n" +
                                           document.all("TextBox1").value;
-                     
+
      }
 
- 
+     //---------------------------------------------
+     function AddItem2PickList()
+     {
+         alert("ok");
+
+     }
+
  </script>
     </head>
 <body style="width:99%; overflow:hidden"  >
     <form id="form1" runat="server" style="text-align: center; overflow:hidden">
-           <div ID="ColumnOption" runat="server">
-              <asp:DropDownList ID="DropDownList1" runat="server" Width="60px" CssClass=textbox
+           <div ID="ColumnOption" runat="server" style="display:">
+              <asp:DropDownList ID="DropDownList1" runat="server" Width="60px" CssClass="textbox"
                   onselectedindexchanged="DropDownList1_SelectedIndexChanged" AutoPostBack="true">
               <asp:ListItem>1</asp:ListItem>
               <asp:ListItem Selected>2</asp:ListItem>
-               <asp:ListItem>3</asp:ListItem>
-               <asp:ListItem>4</asp:ListItem>
+               <%--<asp:ListItem>3</asp:ListItem>
+               <asp:ListItem>4</asp:ListItem>--%>
           </asp:DropDownList> &nbsp; 
           <span class="textbox" style="top:-4px">Column(s) per row</span>
           </div>
@@ -136,34 +158,9 @@
       <input id="_FileName" type="hidden" runat="server" />
 
       <div id="divNote" 
-               style="border-bottom-style:outset; padding: 0px; position:absolute; background-color:Silver; display:none" 
+               style="border: 2px outset ; padding: 0px; position:absolute; background-color:Silver; display:none" 
                runat="server">
-      <table>
-       <tr>
-        <td>
-        </td>
-        <td align="right">
-          <%--<img alt="" class="style1" Style='cursor:hand' src="images/checked.gif" onclick="SubmitTextbox();" />--%>
-          <input id="Button2" type="button" value="Save" onclick="SubmitTextbox();"
-                style="color: #CC3300; font-size: 11px" />&nbsp;&nbsp;&nbsp;
-          <img src="images/del2.gif" Style='cursor:hand' onclick="HideTextbox() " />
-        </td>
-       </tr>
-       <tr>
-        <td colspan=2>
-          <asp:DropDownList ID="ddImageTextList" runat="server" Width="330px" CssClass="textbox" onChange="PopulateDropdowText()">
-              <asp:ListItem></asp:ListItem>
-          </asp:DropDownList>
-        </td>
-       </tr>
-       <tr>
-        <td colspan=2>
-          <asp:TextBox ID="TextBox1" runat="server" Width="330px" Height="80px" 
-             cssclass="textbox" TextMode="MultiLine"></asp:TextBox>
-         </td>
-       </tr>
-       <tr>
-       </table>
+        <ImgEdit:EditForm runat="server" ID="edtForm" />
       </div>
       
     </form>

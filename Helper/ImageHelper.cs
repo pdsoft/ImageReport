@@ -5,6 +5,7 @@ using System.Web;
 using System.IO;
 using System.Drawing;
 using System.Drawing.Imaging;
+using MigraDoc.DocumentObjectModel;
 
 namespace ImageReport.Helper
 {
@@ -49,7 +50,8 @@ namespace ImageReport.Helper
 
         //----------------------------------------------------------------------
         // by Fred, 1-19-2013
-        public static void ResizeImage(HttpPostedFile postedFile, string filePath)
+        //----------------------------------------------------------------------
+        public static Orientation ResizeImage(HttpPostedFile postedFile, string filePath)
         {
             int maxWidth = GetConfigValue.MaxWidth;
             int maxHeight = GetConfigValue.MaxHeight;
@@ -80,6 +82,12 @@ namespace ImageReport.Helper
             }
 
             source.Save(filePath, ImageFormat.Jpeg);
+
+            //-------------------------------------------------
+            Orientation ImgOrientation = Orientation.Landscape;
+            if (height > width) { ImgOrientation = Orientation.Portrait; }
+
+            return ImgOrientation;
         }
 
         //------------------------------------------------------------

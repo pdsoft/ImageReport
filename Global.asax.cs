@@ -6,6 +6,7 @@ using System.Web;
 using System.Web.Security;
 using System.Web.SessionState;
 using ImageReport.Helper;
+using ImageReport.PDFWriter;
 
 namespace ImageReport
 {
@@ -19,12 +20,12 @@ namespace ImageReport
 
         protected void Session_Start(object sender, EventArgs e)
         {
-            IDictionary<string, string> LoadedImgFiles = new Dictionary<string, string>();
+            IDictionary<string, MyImage> LoadedImgFiles = new Dictionary<string, MyImage>();
             Session["LoadedIamges"] = LoadedImgFiles;
 
             // clear the folder, by Fred, 1-19-2013
             DiskFileHelper.ClearFolder(Server.MapPath(GetConfigValue.UploadPath));
-            DiskFileHelper.ClearFolder(Server.MapPath(GetConfigValue.PDFPath));
+          //  DiskFileHelper.ClearFolder(Server.MapPath(GetConfigValue.PDFPath));
         }
 
         protected void Application_BeginRequest(object sender, EventArgs e)

@@ -9,18 +9,19 @@ using Microsoft.Reporting.WebForms;
 using System.IO;
 using System.Text.RegularExpressions;
 using ImageReport.Helper;
+using ImageReport.PDFWriter;
 
 namespace ImageReport
 {
     public partial class ReportOption : System.Web.UI.Page
     {
 
-        IDictionary<string, string> LoadedImgFiles;
+        IDictionary<string, MyImage> LoadedImgFiles;
 
         protected void Page_Load(object sender, EventArgs e)
         {
             //---------------------------------------------------
-            LoadedImgFiles = (IDictionary<string, string>)Session["LoadedIamges"];
+            LoadedImgFiles = (IDictionary<string, MyImage>)Session["LoadedIamges"];
 
             //-------------------------------------
             if (LoadedImgFiles.Count == 0)
@@ -35,65 +36,107 @@ namespace ImageReport
         //-------------------------------------------------------------
         protected void cmdGenerateRpt_Click(object sender, EventArgs e)
         {
-            ReportViewer1.Reset();
-            ReportViewer1.LocalReport.EnableExternalImages = true;
-            ReportViewer1.LocalReport.ReportPath = Server.MapPath("Report.rdlc");
-            ReportDataSource rds = new ReportDataSource("DataSet1", getData());
-            ReportViewer1.LocalReport.DataSources.Clear();
-            ReportViewer1.LocalReport.DataSources.Add(rds);
-            ReportViewer1.DataBind();
+            // GenerateCrystalPDF();
 
-            //---------------------------------------
-            ReportParameter[] parames = new ReportParameter[3];
+            GenerateMicraDocPDF();
+        }
 
-            parames[0] = new ReportParameter("ReporHeader", txtTitle.Text);
-            parames[1] = new ReportParameter("ReportFooter", txtFooter.Text);
-            parames[2] = new ReportParameter("ReportSubtitle",txtSubtitle.Text);
 
-            ReportViewer1.LocalReport.SetParameters(parames);
+       //------------------------------------------
+        private void GenerateMicraDocPDF()
+        {
+            ImageReportPDF pw = new ImageReportPDF();
+            pw.PDFFilePath = Server.MapPath("PDFWriter/pdf");
+            pw.PDFFileName = GetFileName(txtTitle.Text);
+            //pw.ImageFilePath = Server.MapPath("uploads");
+           // ImageReportPDF pw = new ImageReportPDF(Server.MapPath("PDFWriter/pdf"), fileName);
 
-            //-------------------------- generate PDF
-            Warning[] warnings;
-            string[] streamids;
-            string mimetype;
-            string encoding;
-            string extension;
+            pw.LoadedImgFiles = LoadedImgFiles;
+            pw.ReportSummary = txtSummary.Text;
 
-            byte[] bytes = ReportViewer1.LocalReport.Render(
-                            "PDF", null, out mimetype, out encoding, out extension, out streamids, out warnings);
+            string ret = pw.GeneratePDFReport();
 
-            string fileName = GetFileName(txtTitle.Text);       // by Fred, 1-19-2013
-            string filePath = Server.MapPath(GetConfigValue.PDFPath) + @"\" + fileName + ".pdf";            // replace the Session.SessionID by fileName, by Fred, 1-19-2013
-
-            // check if file exist, by Fred, 1-19-2013
-            //if (!File.Exists(filePath))
-            //{
-
-            FileStream fs = new FileStream(filePath, FileMode.Create);
-
-            fs.Write(bytes, 0, bytes.Length);
-            fs.Close();
-
-            //----------------------------------------
-            string pdfURl = @"/" + GetConfigValue.PDFPath + "/" + fileName + ".pdf?" + DateTime.Now.ToString();
-            string scriptString = "<script language=JavaScript>" + "{ openPDF('" + pdfURl + "'); } </script>";
-
-            if (ClientScript.IsClientScriptBlockRegistered("OpenPDFSc") == false)
+            if (ret == "")
             {
-                ClientScript.RegisterClientScriptBlock(this.GetType(), "OpenPDFSc", scriptString);
+                //----------------------------------------
+                string pdfURl = @"/PDFWriter/pdf/" + pw.PDFFileName + ".pdf?" + DateTime.Now.ToString();
+                string scriptString = "<script language=JavaScript>" + "{ openPDF('" + pdfURl + "'); } </script>";
+
+                if (ClientScript.IsClientScriptBlockRegistered("OpenPDFSc") == false)
+                {
+                    ClientScript.RegisterClientScriptBlock(this.GetType(), "OpenPDFSc", scriptString);
+                }
+            }
+            else
+            {
+                Response.Write(ret);
             }
 
-            //}
-            //else
-            //{
-            //    string scriptString = "<script language=JavaScript>" + "{ alert('File name exist already!'); } </script>";
-
-            //    if (ClientScript.IsClientScriptBlockRegistered("OpenPDFSc") == false)
-            //    {
-            //        ClientScript.RegisterClientScriptBlock(this.GetType(), "OpenPDFSc", scriptString);
-            //    }
-            //}
         }
+
+        //------------------------------------------
+        //private void GenerateCrystalPDF()
+        //{
+        //    ReportViewer1.Reset();
+        //    ReportViewer1.LocalReport.EnableExternalImages = true;
+        //    ReportViewer1.LocalReport.ReportPath = Server.MapPath("Report.rdlc");
+        //    ReportDataSource rds = new ReportDataSource("DataSet1", getData());
+        //    ReportViewer1.LocalReport.DataSources.Clear();
+        //    ReportViewer1.LocalReport.DataSources.Add(rds);
+        //    ReportViewer1.DataBind();
+
+        //    //---------------------------------------
+        //    ReportParameter[] parames = new ReportParameter[3];
+
+        //    parames[0] = new ReportParameter("ReporHeader", txtTitle.Text);
+        //    //parames[1] = new ReportParameter("ReportFooter", txtFooter.Text);
+        //    parames[2] = new ReportParameter("ReportSubtitle", txtSubtitle.Text);
+
+        //    ReportViewer1.LocalReport.SetParameters(parames);
+
+        //    //-------------------------- generate PDF
+        //    Warning[] warnings;
+        //    string[] streamids;
+        //    string mimetype;
+        //    string encoding;
+        //    string extension;
+
+        //    byte[] bytes = ReportViewer1.LocalReport.Render(
+        //                    "PDF", null, out mimetype, out encoding, out extension, out streamids, out warnings);
+
+        //    string fileName = GetFileName(txtTitle.Text);       // by Fred, 1-19-2013
+        //    string filePath = Server.MapPath(GetConfigValue.PDFPath) + @"\" + fileName + ".pdf";            // replace the Session.SessionID by fileName, by Fred, 1-19-2013
+
+        //    // check if file exist, by Fred, 1-19-2013
+        //    //if (!File.Exists(filePath))
+        //    //{
+
+        //    FileStream fs = new FileStream(filePath, FileMode.Create);
+
+        //    fs.Write(bytes, 0, bytes.Length);
+        //    fs.Close();
+
+        //    //----------------------------------------
+        //    string pdfURl = @"/" + GetConfigValue.PDFPath + "/" + fileName + ".pdf?" + DateTime.Now.ToString();
+        //    string scriptString = "<script language=JavaScript>" + "{ openPDF('" + pdfURl + "'); } </script>";
+
+        //    if (ClientScript.IsClientScriptBlockRegistered("OpenPDFSc") == false)
+        //    {
+        //        ClientScript.RegisterClientScriptBlock(this.GetType(), "OpenPDFSc", scriptString);
+        //    }
+
+        //    //}
+        //    //else
+        //    //{
+        //    //    string scriptString = "<script language=JavaScript>" + "{ alert('File name exist already!'); } </script>";
+
+        //    //    if (ClientScript.IsClientScriptBlockRegistered("OpenPDFSc") == false)
+        //    //    {
+        //    //        ClientScript.RegisterClientScriptBlock(this.GetType(), "OpenPDFSc", scriptString);
+        //    //    }
+        //    //}
+        //}
+
 
         //--------------------------------------------
         //--------------------------------------------

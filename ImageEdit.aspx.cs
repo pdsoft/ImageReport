@@ -10,6 +10,7 @@ using System.Web.Script.Services;
 using System.IO;
 using System.Data;
 using ImageReport.Helper;
+using ImageReport.PDFWriter;
 
 namespace ImageReport
 {
@@ -20,13 +21,7 @@ namespace ImageReport
         protected void Page_Load(object sender, EventArgs e)
         {
 
-            if (!Page.IsPostBack)
-            {
-                GenerateImageTable();
-
-                PopulateDropdown4ImageText();
-            }
-            else
+            if (Page.IsPostBack)
             {
                 if (_Action.Value == "REMOVE")
                 {
@@ -36,6 +31,14 @@ namespace ImageReport
 
                 _Action.Value = "";
             }
+            else
+            {
+                //-------------------------------
+                GenerateImageTable();
+
+                // PopulateDropdown4ImageText();
+                PopulateDropdownFromExcel();
+            }
         }
 
         //------------------------------------------------
@@ -44,8 +47,8 @@ namespace ImageReport
             //--------------------------------------
             columns = Convert.ToInt16(DropDownList1.SelectedValue);
 
-            IDictionary<string, string> LoadedImgFiles =
-                       (IDictionary<string, string>)Session["LoadedIamges"];
+            IDictionary<string, MyImage> LoadedImgFiles =
+                       (IDictionary<string, MyImage>)Session["LoadedIamges"];
 
             //-------------------------------------
             if (LoadedImgFiles.Count == 0)
@@ -97,8 +100,8 @@ namespace ImageReport
         private void RemoveFileNamefromList(string FileName)
         {
 
-            IDictionary<string, string> LoadedImgFiles
-                        = (IDictionary<string, string>)Session["LoadedIamges"];
+            IDictionary<string, MyImage> LoadedImgFiles
+                        = (IDictionary<string, MyImage>)Session["LoadedIamges"];
 
             LoadedImgFiles.Remove(FileName);
 
@@ -112,6 +115,7 @@ namespace ImageReport
             TableCell tc = new TableCell();
 
             tc.Controls.Add(AddOneImage(FileName, txtNotes, ImageNo));
+            
 
             return tc;
         }
@@ -146,6 +150,8 @@ namespace ImageReport
             img.ID = "img" + ImageNo;
 
             tc.Controls.Add(img);
+            tc.VerticalAlign = VerticalAlign.Middle;
+
             tr.Cells.Add(tc);
             //--------------------------------
             TableCell tc2 = new TableCell();
@@ -178,6 +184,21 @@ namespace ImageReport
 
 
         //----------------------------------------------------
+        protected void PopulateDropdownFromExcel()
+        {
+            string FilePath = Server.MapPath("content\\PickList.xlsx");
+
+            ExcelFile ef = new ExcelFile(FilePath);
+
+            DataSet ds = ef.GetDropDownList();
+
+            //--------------------------------------------------
+            DropDownListDataBind("ddObservation", ds.Tables[0]);
+            DropDownListDataBind("ddDeficiency", ds.Tables[1]);
+
+        }
+
+        //----------------------------------------------------
         protected void PopulateDropdown4ImageText()
         {
             string FilePicklist = Server.MapPath("Picklist.txt");
@@ -188,12 +209,33 @@ namespace ImageReport
                 string line = sr.ReadToEnd();
                 string[] ar = line.Split(';');
 
-                ddImageTextList.DataSource = GetDataTable(ar);
-                ddImageTextList.DataTextField = "Text"; // displayed text in UI
-                ddImageTextList.DataValueField = "Value"; 
+                DataTable tbl = GetDataTable(ar);
 
-                ddImageTextList.DataBind();
+                DropDownListDataBind("ddObservation", tbl);
+                DropDownListDataBind("ddDeficiency", tbl);
+
+                //DropDownList lst = (DropDownList)edtForm.FindControl("ddObservation");
+                //lst.DataSource = GetDataTable(ar);
+                //lst.DataTextField = "Text"; // displayed text in UI
+                //lst.DataValueField = "Value";
+
+                //lst.DataBind();
             }
+        }
+
+        //-----------------------------------
+        private void DropDownListDataBind(string ddName, DataTable tbl)
+        {
+            DropDownList lst = (DropDownList)edtForm.FindControl(ddName);
+
+            string colName = tbl.Columns[0].ColumnName;
+
+            lst.DataSource = tbl;
+            lst.DataTextField = colName; // displayed text in UI
+            lst.DataValueField = colName;
+
+            lst.DataBind();
+
         }
 
         //---------------------------------------------
@@ -243,10 +285,10 @@ namespace ImageReport
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         public static void SubmitNewDesc(string fileName, string Desc) 
         {
-            IDictionary<string, string> LoadedImgFiles
-                        = (IDictionary<string, string>)HttpContext.Current.Session["LoadedIamges"];
+            IDictionary<string, MyImage> LoadedImgFiles
+                        = (IDictionary<string, MyImage>)HttpContext.Current.Session["LoadedIamges"];
 
-            LoadedImgFiles[fileName] = Desc;
+            ((MyImage)LoadedImgFiles[fileName]).ImageDesc = Desc;
 
             HttpContext.Current.Session["LoadedIamges"] = LoadedImgFiles;
         }
@@ -255,10 +297,23 @@ namespace ImageReport
         [WebMethod(EnableSession = true)]
         public static string GetDescription(string fileName) 
         {
-            IDictionary<string, string> LoadedImgFiles
-                        = (IDictionary<string, string>)HttpContext.Current.Session["LoadedIamges"];
+            IDictionary<string, MyImage> LoadedImgFiles
+                        = (IDictionary<string, MyImage>)HttpContext.Current.Session["LoadedIamges"];
 
-          return LoadedImgFiles[fileName].ToString();
+            return ((MyImage)LoadedImgFiles[fileName]).ImageDesc.ToString();
+        }
+
+
+        //----------------------------------------------------
+        [WebMethod(EnableSession = true)]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public static void AddNewItem2PickList(string tblName, string NewListItem) 
+        {
+            string FilePath = HttpContext.Current.Server.MapPath("content\\PickList.xlsx");
+
+            ExcelFile ef = new ExcelFile(FilePath);
+
+            ef.InsertPickListItem(tblName, NewListItem);
         }
 
     }

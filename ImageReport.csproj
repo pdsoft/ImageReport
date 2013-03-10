@@ -130,6 +130,7 @@
     <Folder Include="uploads\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="CSS\jquery-ui-custom.css" />
     <Content Include="CSS\site.css" />
     <Content Include="CSS\uploadify.css" />
     <Content Include="default.aspx" />
@@ -143,6 +144,7 @@
     <Content Include="scripts\DivMouseMov.js" />
     <Content Include="scripts\jquery-1.4.1.js" />
     <Content Include="scripts\jquery-1.4.1.min.js" />
+    <Content Include="scripts\jquery-ui-custom.js" />
     <Content Include="scripts\jquery.uploadify.js" />
     <Content Include="scripts\uploader.swf" />
     <Content Include="TODO.txt" />

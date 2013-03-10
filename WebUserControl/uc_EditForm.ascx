@@ -17,7 +17,7 @@
         Observation:
     </td>
     <td>
-        <asp:TextBox ID="txtObservation" runat="server" Width="330px" CssClass="textbox"></asp:TextBox>
+        <asp:TextBox ID="txtObservation" runat="server" Width="330px" CssClass="textbox"></asp:TextBox>&nbsp;
 <%--        <asp:DropDownList ID="ddObservation" runat="server" Width="330px" CssClass="textbox">
             <asp:ListItem></asp:ListItem>
         </asp:DropDownList>&nbsp;--%>
@@ -29,7 +29,7 @@
         Deficiency:
     </td>
     <td>
-        <asp:TextBox ID="txtDeficiency" runat="server" Width="330px" CssClass="textbox"></asp:TextBox>
+        <asp:TextBox ID="txtDeficiency" runat="server" Width="330px" CssClass="textbox"></asp:TextBox>&nbsp;
 <%--        <asp:DropDownList ID="ddDeficiency" runat="server" Width="330px" CssClass="textbox">
             <asp:ListItem></asp:ListItem>
         </asp:DropDownList>&nbsp;--%>

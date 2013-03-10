@@ -11,9 +11,12 @@
     <%--<script src="scripts/DivMouseMov.js" type="text/javascript"></script>--%>
 
     <link href="/CSS/site.css" rel="stylesheet" type="text/css" />
-    <link href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" rel="stylesheet" type="text/css" /> 
-    <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.9.0.min.js" type="text/javascript"></script>
-    <script src="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.9.2/jquery-ui.min.js" type="text/javascript"></script>
+    <link href="http://code.jquery.com/ui/1.10.1/themes/base/jquery-ui.css" rel="stylesheet" type="text/css" /> 
+    <script src="http://code.jquery.com/jquery-1.9.1.js" type="text/javascript"></script>
+    <script src="http://code.jquery.com/ui/1.10.1/jquery-ui.js" type="text/javascript"></script>
+
+    <link href="CSS/jquery-ui-custom.css" rel="stylesheet" type="text/css" />
+    <script src="scripts/jquery-ui-custom.js" type="text/javascript"></script>
  <script type="text/javascript">
 
      //------------------------------------
@@ -32,8 +35,17 @@
      
      //-----------------------------------------
      function ShowEditTextbox(ImageNo, fileName) {
+        if ($("#divNote").is(":visible")) {
+            HideTextbox();
+        }
+
+         // get autocomplele on textbox
+        AutoCompleteComboBox("#edtForm_txtObservation", 0);
+        AutoCompleteComboBox("#edtForm_txtDeficiency", 1);
+        AutoCompleteComboBox("#edtForm_txtRecommendation", 2);
+
          //---------------- ajax call to get the description text
-         var txt1=null;
+         var txt1 = null;
 
          $.ajax({
              type: "POST",
@@ -60,15 +72,10 @@
 
          var obj = jQuery.parseJSON(txt1);
 
-         // by Fred, 2-16-2013
-         document.getElementById("edtForm_txtObservation").value = $(obj.d).find("Observation").text();
-         document.getElementById("edtForm_txtDeficiency").value = $(obj.d).find("Deficiency").text();
-         document.getElementById("edtForm_txtRecommendation").value = $(obj.d).find("Recommendation").text();
-    
-         // get autocomplele on textbox
-         AutoComplete("edtForm_txtObservation", 0);
-         AutoComplete("edtForm_txtDeficiency", 1);
-         AutoComplete("edtForm_txtRecommendation", 2);
+         // call change to trigger change event, by Fred, 2-16-2013
+         $("#edtForm_txtObservation").val($(obj.d).find("Observation").text()).change();
+         $("#edtForm_txtDeficiency").val($(obj.d).find("Deficiency").text()).change();
+         $("#edtForm_txtRecommendation").val($(obj.d).find("Recommendation").text()).change();
 
          //-----------------------------------
          //$("divNote").mousedown(function (e) { alert("ff"); dragBegin(e); });
@@ -78,8 +85,8 @@
      }
 
      // by Fred, 2-16-2013
-     function AutoComplete(txtControl, tableIndex) {
-         $("#" + txtControl).autocomplete({
+     function AutoCompleteComboBox(txtControl, tableIndex) {
+         $(txtControl).combobox({
              source: function (request, response) {
                  $.ajax({
                      type: "post",
@@ -93,16 +100,11 @@
                                  value: item
                              }
                          }))
-                     },
-                     error: function (XMLHttpRequest, textStatus, errorThrown) {
-                         alert(textStatus);
-                     },
-                     delay: 500
+                     }
                  });
-             }
+             },
+             delay: 1000
          });
-
-         $('.ui-corner-all').css('fontSize', '10px');  
      }
      // end
      //-----------------------------------------
@@ -118,16 +120,21 @@
 
      //-------------------------------------------
      function HideTextbox() {
-        divNote.style.display="none";
+         divNote.style.display = "none";
+
+         // destroy combobox, by Fred, 2-18-2013
+         $("#edtForm_txtObservation").combobox("destroy");
+         $("#edtForm_txtDeficiency").combobox("destroy");
+         $("#edtForm_txtRecommendation").combobox("destroy");
      }
 
      //-------------------------------------------
      function SubmitTextbox() {
          var txt1 = null;
 
-         var desc = "<Summary>" + "<Observation>" + document.getElementById("edtForm_txtObservation").value + "</Observation>"
-                     + "<Deficiency>" + document.getElementById("edtForm_txtDeficiency").value + "</Deficiency>"
-                     + "<Recommendation>" + document.getElementById("edtForm_txtRecommendation").value + "</Recommendation>"
+         var desc = "<Summary>" + "<Observation>" + $("#edtForm_txtObservation").val() + "</Observation>"
+                     + "<Deficiency>" + $("#edtForm_txtDeficiency").val() + "</Deficiency>"
+                     + "<Recommendation>" + $("#edtForm_txtRecommendation").val() + "</Recommendation>"
                      + "</Summary>";
                      
          //alert(desc);
@@ -254,6 +261,11 @@
                  $(this).css("opacity", "1");
 
                  SetImageDraggable();
+
+                 // by Fred, 2-20-2013
+                 if ($("#divNote").is(":visible")) {
+                     HideTextbox();
+                 }
              }
          });
      })
